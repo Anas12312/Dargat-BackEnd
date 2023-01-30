@@ -15,21 +15,35 @@ export type Grade = {
     percent: number
 }
 
-const  readData = async ():Promise<unknown[]> => {
-    let results:unknown[] = [];
-    const o = fs.createReadStream('data.csv');
-            o.pipe(csv())
-            .on('data', (data) => results.push(data))
-            .on('end', () => console.log(results));
-
-            console.log(o);
-    return results;
-}
 
 export class GradeStore {
-    index(): unknown[] {
-        const x = readData();
-        console.log("a7aaaaaaaaaaaaaaaaa");
-        return x;
+    async index(): Promise<unknown[]> {
+        const csv = fs.readFileSync("data.csv");
+        const array = csv.toString().split("\r");
+        let result = [];
+        let headers = array[0].split(", ");
+        for (let i = 1; i < array.length - 1; i++) {
+            let obj = {}
+            let str = array[i]
+            let s = ''
+            let flag = 0
+            for (let ch of str) {
+              if (ch === '"' && flag === 0) {
+                flag = 1
+              }
+              else if (ch === '"' && flag == 1) flag = 0
+              if (ch === ', ' && flag === 0) ch = '|'
+              if (ch !== '"') s += ch
+            }
+
+            let properties = s.split("|")
+            obj = {
+                [headers[0]]: properties[0],
+                [headers[1]]: properties[1]
+            }
+            
+            result.push(obj)
+          }
+          return result;
     }
 }
