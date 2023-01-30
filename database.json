@@ -4,7 +4,7 @@
       "host": "127.0.0.1",
       "database": "grades",
       "user": "postgres",
-      "password": "0102736245"
+      "password": "postgres"
     },
     "test": {
       "driver": "pg",
