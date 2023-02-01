@@ -35,7 +35,7 @@ const updateRecord = (dep:string,year:string) => {
 }
 
 const app: express.Application = express()
-const address: string = "0.0.0.0:3000"
+const address: string = "127.0.0.1:80"
 
 const corsOption = {
     origin: 'http://localhost:3000',
@@ -46,12 +46,28 @@ app.use(cors(corsOption));
 app.use(bodyParser.json())
 
 app.get('/update', (req, res) => {
-    updateRecord(req.query.dep as string, req.query.year as string);
+    const dep = req.query.dep as string;
+    const year = req.query.year as string;
+    if (!dep || !year) {
+        res.status(400).send('Stop Missing With Our Data We Can See You !!');
+        return;
+    }
+    updateRecord(dep, year);
     res.send('load el files ya 3bd');
 })
 
 app.get('/', (req, res) => {
-    res.send(records[Number(req.query.dep as string)][Number(req.query.year as string)]);
+    const dep = req.query.dep as string;
+    const year = req.query.year as string;
+    if (!dep || !year) {
+        res.status(400).send('Stop Missing With Our Data We Can See You !!');
+        return;
+    }
+    if(Number(dep) === 555 || Number(year) === 555) {
+        res.status(400).send('Get The Fu*k Out !');
+        return;
+    }
+    res.send(records[Number(dep)][Number(year)]);
 })
 
 app.listen(80, function () {
