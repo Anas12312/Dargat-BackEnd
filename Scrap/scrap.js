@@ -40,8 +40,6 @@ async function getData(start, end) {
             const subject3 = Number(record[70]);
             const subject4 = Number(record[84]);
             const subTitle1 = record[38];
-            // const subject5 = Number(record[98]);
-            // const subject6 = Number(record[112]);
             const total = subject1+subject2+subject3+subject4;
             const p = (total/550)*100
             

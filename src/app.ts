@@ -5,6 +5,9 @@ import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
 
+function appendReport(report: string) {
+    fs.appendFileSync(path.join(__dirname,'../Report/reports.txt'), report); 
+}
 
 const getRecordedData = () => {
     for(let i=0; i<5; i++) {
@@ -15,7 +18,7 @@ const getRecordedData = () => {
             skip_empty_lines: true
         }));
         }
-    }
+    } 
 }
 
 const records:unknown[][] = [[],[],[],[],[]];
@@ -43,6 +46,14 @@ const corsOption = {
 
 app.use(cors(corsOption));
 app.use(bodyParser.json())
+
+
+app.post("/report", function(req, res) {
+    const report = `==============================` +
+                    `\n${req.body.title}` +
+                    `\n${req.body.body}`
+    appendReport(report)
+})
 
 app.get('/update', (req, res) => {
     const dep = req.query.dep as string;
