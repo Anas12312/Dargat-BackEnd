@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import routes from './handlers/grades_handler'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
@@ -70,6 +69,6 @@ app.get('/', (req, res) => {
     res.send(records[Number(dep)][Number(year)]);
 })
 
-app.listen(80, function () {
+app.listen(5555, function () {
     console.log(`starting app on: ${address}`);
 })

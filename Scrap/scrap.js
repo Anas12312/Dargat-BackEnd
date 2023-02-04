@@ -3,7 +3,7 @@ const puppeteer =  require("puppeteer");
 const path = require('path');
 
 async function getData(start, end) {
-    const browser = await puppeteer.launch({ headless:false })
+    const browser = await puppeteer.launch({ headless:true })
     const page = await browser.newPage();
     const arr = [];
     for(let i=start;i <= end;i++) {
@@ -15,21 +15,25 @@ async function getData(start, end) {
             const subject2 = Number(record[56]);
             const subject3 = Number(record[70]);
             const subject4 = Number(record[84]);
-            const subject5 = Number(record[98]);
-            const subject6 = Number(record[112]);
-            const total = subject1+subject2+subject3+subject4+subject5+subject6;
-            console.log(record[5])
-            return {
+            const subTitle1 = record[38];
+            // const subject5 = Number(record[98]);
+            // const subject6 = Number(record[112]);
+            const total = subject1+subject2+subject3+subject4;
+            const p = (total/550)*100
+            console.log(record[42])
+            
+            obj = {
                 id,
                 name: record[5],
                 subject1,
                 subject2,
                 subject3,
                 subject4,
-                subject5,
-                subject6,
-                total
+                total,
+                p
             }
+
+            return obj
         })
         if(Number(data.id) !== 0) arr.push(data);
     }
@@ -38,11 +42,11 @@ async function getData(start, end) {
 }
 const objToCsv = async (arr,i ,j) => {
     const csv = new ObjectsToCsv(arr);
-    await csv.toDisk(path.join(__dirname, `./Data/_${i}${j}.csv`));
+    await csv.toDisk(path.join(__dirname, `../Data/_${i}${j}.csv`));
 }
 const run = async (start, end, dep, year) => {
-    const arr = await getData(start,end);
-    console.log(arr)
-    objToCsv(arr,dep, year);
+    const result = await getData(start,end);
+    console.log(result.arr)
+    // objToCsv(arr,dep, year);
 }
-run(285260,289689,0,0);
+run(285260,285263,0,0);
