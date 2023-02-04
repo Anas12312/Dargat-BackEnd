@@ -6,6 +6,28 @@ import fs from 'fs'
 import path from 'path'
 import e from 'cors'
 
+let lastSavedStats:number[] = Array(21).fill(0);
+let stats:number[] = Array(21).fill(0);
+
+const refreshStates = (index: number) => {
+    const file = fs.createWriteStream(path.join(__dirname,'../Stats/stats.txt'));
+    stats.forEach(function(v) { file.write(v + '\n'); });
+    file.end();
+    lastSavedStats = [...stats];
+}
+
+const getStats = () => {
+    fs.readFile(path.join(__dirname,'../Stats/stats.txt'), (err, data) => {
+        const statsString = data.toString().split('\n');
+        statsString.forEach((state, i) => {
+            lastSavedStats[i] = Number(state);
+        })
+    })
+    stats = [...lastSavedStats];
+}
+getStats();
+
+
 function appendReport(report: string) {
     fs.appendFileSync(path.join(__dirname,'../Report/reports.txt'), report); 
 }
@@ -79,6 +101,15 @@ app.get('/', (req, res) => {
         res.status(400).send('Get The Fu*k Out !');
         return;
     }
+    stats[0]++;
+    if(stats[0] - lastSavedStats[0] >= 5) {
+        refreshStates(0);
+    }
+    stats[Number(dep)*4 + Number(year) + 1]++;
+    if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
+        refreshStates(Number(dep)*4 + Number(year) + 1);
+    }
+    console.log(stats, lastSavedStats)
     res.send(records[Number(dep)][Number(year)]);
 })
 
