@@ -6,6 +6,7 @@ import fs from 'fs'
 import path from 'path'
 import e from 'cors'
 import run from '../Scrap/scrap'
+import { send } from 'process'
 
 let lastSavedStats:number[] = Array(21).fill(0);
 let stats:number[] = Array(21).fill(0);
@@ -73,7 +74,7 @@ app.use(cors())
 app.use(bodyParser.json())
 
 
-app.post("/report", function(req, res) {
+app.post("/", function(req, res) {
     const report = `==============================` +
                     `\n${req.body.title}` +
                     `\n${req.body.body}\n` 
@@ -95,23 +96,42 @@ app.get('/update', (req, res) => {
 app.get('/', (req, res) => {
     const dep = req.query.dep as string;
     const year = req.query.year as string;
-    if (!dep || !year) {
-        res.status(400).send('Stop Missing With Our Data We Can See You !!');
-        return;
+    const type = req.query.type as string;
+
+    if(!type) {
+        res.sendStatus(400).send("Error");
     }
-    if(Number(dep) === 555 || Number(year) === 555) {
-        res.status(400).send('Get The Fu*k Out !');
-        return;
+    if(type === "root") {
+        if (!dep || !year) {
+            res.status(400).send('Stop Missing With Our Data We Can See You !!');
+            return;
+        }
+        if(Number(dep) === 555 || Number(year) === 555) {
+            res.status(400).send('Get The Fu*k Out !');
+            return;
+        }
+        stats[0]++;
+        if(stats[0] - lastSavedStats[0] >= 5) {
+            refreshStates(0);
+        }
+        stats[Number(dep)*4 + Number(year) + 1]++;
+        if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
+            refreshStates(Number(dep)*4 + Number(year) + 1);
+        }
+        res.send(records[Number(dep)][Number(year)]);
+    }else if(type === "update") {
+        updateRecord(dep, year);
+        res.send('load el files ya 3bd');
+    }else if(type === "reports") {
+        fs.readFile(path.join(__dirname,'../Report/reports.txt'), (err, data) => {
+            if(err) throw err;
+            res.send(data.toLocaleString());
+        })
+    }else if(type === "stats") {
+        res.send(JSON.stringify({counters: stats}))
+    }else {
+        res.sendStatus(400).send("error");
     }
-    stats[0]++;
-    if(stats[0] - lastSavedStats[0] >= 5) {
-        refreshStates(0);
-    }
-    stats[Number(dep)*4 + Number(year) + 1]++;
-    if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
-        refreshStates(Number(dep)*4 + Number(year) + 1);
-    }
-    res.send(records[Number(dep)][Number(year)]);
 })
 
 app.get('/reports',  (req,res) => {
