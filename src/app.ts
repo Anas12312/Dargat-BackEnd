@@ -4,6 +4,7 @@ import cors from 'cors'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
+import e from 'cors'
 
 function appendReport(report: string) {
     fs.appendFileSync(path.join(__dirname,'../Report/reports.txt'), report); 
@@ -79,6 +80,13 @@ app.get('/', (req, res) => {
         return;
     }
     res.send(records[Number(dep)][Number(year)]);
+})
+
+app.get('/reports',  (req,res) => {
+    fs.readFile(path.join(__dirname,'../Report/reports.txt'), (err, data) => {
+        if(err) throw err;
+        res.send(data.toLocaleString());
+    })
 })
 
 app.listen(5555, function () {

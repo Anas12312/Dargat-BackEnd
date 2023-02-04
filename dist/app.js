@@ -72,6 +72,9 @@ app.get('/', function (req, res) {
     }
     res.send(records[Number(dep)][Number(year)]);
 });
+
+app.get('/reports', function(req, res) {})
+
 app.listen(5555, function () {
     console.log("starting app on: ".concat(address));
 });
