@@ -9,6 +9,9 @@ var cors_1 = __importDefault(require("cors"));
 var sync_1 = require("csv-parse/sync");
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
+function appendReport(report) {
+    fs_1.default.appendFileSync(path_1.default.join(__dirname, '../Report/reports.txt'), report);
+}
 var getRecordedData = function () {
     for (var i = 0; i < 5; i++) {
         for (var j = 0; j < 4; j++) {
@@ -39,6 +42,13 @@ var corsOption = {
 };
 app.use((0, cors_1.default)(corsOption));
 app.use(body_parser_1.default.json());
+app.post("/report", function (req, res) {
+    var report = "==============================" +
+        "\n".concat(req.body.title) +
+        "\n".concat(req.body.body, "\n");
+    appendReport(report);
+    res.send('ok');
+});
 app.get('/update', function (req, res) {
     var dep = req.query.dep;
     var year = req.query.year;
@@ -62,6 +72,6 @@ app.get('/', function (req, res) {
     }
     res.send(records[Number(dep)][Number(year)]);
 });
-app.listen(80, function () {
+app.listen(5555, function () {
     console.log("starting app on: ".concat(address));
 });

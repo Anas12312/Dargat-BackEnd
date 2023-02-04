@@ -51,8 +51,9 @@ app.use(bodyParser.json())
 app.post("/report", function(req, res) {
     const report = `==============================` +
                     `\n${req.body.title}` +
-                    `\n${req.body.body}`
+                    `\n${req.body.body}\n` 
     appendReport(report)
+    res.send('ok');
 })
 
 app.get('/update', (req, res) => {
