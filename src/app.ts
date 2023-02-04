@@ -4,9 +4,6 @@ import cors from 'cors'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
-import e from 'cors'
-import run from '../Scrap/scrap'
-import { send } from 'process'
 
 let lastSavedStats:number[] = Array(21).fill(0);
 let stats:number[] = Array(21).fill(0);
@@ -145,10 +142,6 @@ app.get('/stats', (req, res) => {
     res.send(JSON.stringify({counters: stats}))
 })
 
-app.get('/a7a',  (req, res) => {
-    run(req.query.start, req.query.end, req.query.d, req.query.y);
-    res.send('a7aten')
-})
 
 app.get('/wtf', (req,res) => {
     res.send('aaaa7a')
