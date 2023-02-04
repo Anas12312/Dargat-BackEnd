@@ -71,3 +71,5 @@ const run = async (start, end, dep, year) => {
     objToCsv(arr,dep, year);
 }
 run(285260,285650,0,0);
+
+export default run;

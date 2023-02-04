@@ -5,6 +5,7 @@ import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
 import e from 'cors'
+import run from '../Scrap/scrap'
 
 let lastSavedStats:number[] = Array(21).fill(0);
 let stats:number[] = Array(21).fill(0);
@@ -22,8 +23,9 @@ const getStats = () => {
         statsString.forEach((state, i) => {
             lastSavedStats[i] = Number(state);
         })
+        stats = [...lastSavedStats];
     })
-    stats = [...lastSavedStats];
+    
 }
 getStats();
 
@@ -67,7 +69,7 @@ const corsOption = {
     optionsSuccessStatus: 200
 }
 
-app.use(cors(corsOption));
+app.use(cors())
 app.use(bodyParser.json())
 
 
@@ -109,7 +111,6 @@ app.get('/', (req, res) => {
     if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
         refreshStates(Number(dep)*4 + Number(year) + 1);
     }
-    console.log(stats, lastSavedStats)
     res.send(records[Number(dep)][Number(year)]);
 })
 
@@ -118,6 +119,19 @@ app.get('/reports',  (req,res) => {
         if(err) throw err;
         res.send(data.toLocaleString());
     })
+})
+
+app.get('/stats', (req, res) => {
+    res.send(JSON.stringify({counters: stats}))
+})
+
+app.get('/a7a',  (req, res) => {
+    run(req.query.start, req.query.end, req.query.d, req.query.y);
+    res.send('a7aten')
+})
+
+app.get('/wtf', (req,res) => {
+    res.send('a7a')
 })
 
 app.listen(5555, function () {
