@@ -6,6 +6,30 @@ async function getData(start, end) {
     const browser = await puppeteer.launch({ headless:true })
     const page = await browser.newPage();
     const arr = [];
+
+
+    await page.goto(`http://app1.helwan.edu.eg/Commerce/HasasnUpMview.asp?StdCode=${start}`);
+        const data = await page.evaluate(() => {
+            const record = Array.from(document.querySelectorAll('b')).map((x) => x.textContent);
+            const subject1 = record[38];
+            const subject2 = record[52];
+            const subject3 = record[66];
+            const subject4 = record[80];
+            obj = {
+                id : 0,
+                name: '',
+                subject1,
+                subject2,
+                subject3,
+                subject4,
+                total: 0,
+                p: 0
+            }
+            return obj
+        })
+        arr.push(data);
+        
+
     for(let i=start;i <= end;i++) {
         await page.goto(`http://app1.helwan.edu.eg/Commerce/HasasnUpMview.asp?StdCode=${i}`);
         const data = await page.evaluate(() => {
@@ -20,7 +44,6 @@ async function getData(start, end) {
             // const subject6 = Number(record[112]);
             const total = subject1+subject2+subject3+subject4;
             const p = (total/550)*100
-            console.log(record[42])
             
             obj = {
                 id,
@@ -45,8 +68,8 @@ const objToCsv = async (arr,i ,j) => {
     await csv.toDisk(path.join(__dirname, `../Data/_${i}${j}.csv`));
 }
 const run = async (start, end, dep, year) => {
-    const result = await getData(start,end);
-    console.log(result.arr)
-    // objToCsv(arr,dep, year);
+    const arr = await getData(start,end);
+    console.log(arr)
+    objToCsv(arr,dep, year);
 }
-run(285260,285263,0,0);
+run(285260,285650,0,0);
