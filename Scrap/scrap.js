@@ -65,11 +65,10 @@ const objToCsv = async (arr,i ,j) => {
     const csv = new ObjectsToCsv(arr);
     await csv.toDisk(path.join(__dirname, `../Data/_${i}${j}.csv`));
 }
-const run = async (start, end, dep, year) => {
+const runScript = async (start, end, dep, year) => {
     const arr = await getData(start,end);
     console.log(arr)
     objToCsv(arr,dep, year);
 }
-run(285260,285650,0,0);
 
-export default run;
+export default runScript;

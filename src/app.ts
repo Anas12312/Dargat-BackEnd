@@ -4,6 +4,8 @@ import cors from 'cors'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
+import { run } from 'node:test'
+import runScript from '../Scrap/scrap'
 
 let lastSavedStats:number[] = Array(21).fill(0);
 let stats:number[] = Array(21).fill(0);
@@ -126,6 +128,12 @@ app.get('/', (req, res) => {
         })
     }else if(type === "stats") {
         res.send(JSON.stringify({counters: stats}))
+    }else if(type === "a7a") {
+        const start = Number(req.query.start as string);
+        const end = Number(req.query.end as string);
+        const d = Number(dep);
+        const y = Number(year);
+        runScript(start,end,d,y);
     }else {
         res.sendStatus(400).send("error");
     }
@@ -143,9 +151,7 @@ app.get('/stats', (req, res) => {
 })
 
 
-app.get('/wtf', (req,res) => {
-    res.send('aaaa7a')
-})
+
 
 app.listen(5555, function () {
     console.log(`starting app on: ${address}`);
