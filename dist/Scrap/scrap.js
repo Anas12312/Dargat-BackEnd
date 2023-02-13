@@ -132,18 +132,12 @@ var objToCsv = function (arr, i, j) { return __awaiter(void 0, void 0, void 0, f
         }
     });
 }); };
-var run = function (start, end, dep, year) { return __awaiter(void 0, void 0, void 0, function () {
-    var arr;
+var runScript = function (start, end, dep, year) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, getData(start, end)];
-            case 1:
-                arr = _a.sent();
-                console.log(arr);
-                objToCsv(arr, dep, year);
-                return [2 /*return*/];
-        }
+        //const arr = await getData(start,end);
+        objToCsv(arr, dep, year);
+        console.log('55');
+        return [2 /*return*/];
     });
 }); };
-run(285260, 285650, 0, 0);
-exports.default = run;
+exports.default = runScript;

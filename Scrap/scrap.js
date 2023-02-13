@@ -3,18 +3,20 @@ const puppeteer =  require("puppeteer");
 const path = require('path');
 
 async function getData(start, end) {
-    const browser = await puppeteer.launch({ headless:true })
+    const browser = await puppeteer.launch({ headless:false })
     const page = await browser.newPage();
     const arr = [];
 
 
-    await page.goto(`http://app1.helwan.edu.eg/Commerce/HasasnUpMview.asp?StdCode=${start}`);
+    await page.goto(`http://app1.helwan.edu.eg/EngHelwan/HasasnUpMview.asp?StdCode=${start}`,{timeout: 0});
         const data = await page.evaluate(() => {
             const record = Array.from(document.querySelectorAll('b')).map((x) => x.textContent);
             const subject1 = record[38];
             const subject2 = record[52];
             const subject3 = record[66];
             const subject4 = record[80];
+            const subject5 = record[94];
+            const subject6 = record[108];
             obj = {
                 id : 0,
                 name: '',
@@ -22,6 +24,8 @@ async function getData(start, end) {
                 subject2,
                 subject3,
                 subject4,
+                subject5,
+                subject6,
                 total: 0,
                 p: 0
             }
@@ -31,7 +35,7 @@ async function getData(start, end) {
         
 
     for(let i=start;i <= end;i++) {
-        await page.goto(`http://app1.helwan.edu.eg/Commerce/HasasnUpMview.asp?StdCode=${i}`);
+        await page.goto(`http://app1.helwan.edu.eg/EngHelwan/HasasnUpMview.asp?StdCode=${i}`,{timeout: 0});
         const data = await page.evaluate(() => {
             const record = Array.from(document.querySelectorAll('b')).map((x) => x.textContent);
             const id =record[8];
@@ -39,9 +43,11 @@ async function getData(start, end) {
             const subject2 = Number(record[56]);
             const subject3 = Number(record[70]);
             const subject4 = Number(record[84]);
+            const subject5 = Number(record[98]);
+            const subject6 = Number(record[112]);
             const subTitle1 = record[38];
-            const total = subject1+subject2+subject3+subject4;
-            const p = (total/550)*100
+            const total = subject1+subject2+subject3+subject4+subject5;
+            const p = (total/750)*100
             
             obj = {
                 id,
@@ -50,6 +56,8 @@ async function getData(start, end) {
                 subject2,
                 subject3,
                 subject4,
+                subject5,
+                subject6,
                 total,
                 p
             }
@@ -67,8 +75,10 @@ const objToCsv = async (arr,i ,j) => {
 }
 const runScript = async (start, end, dep, year) => {
     const arr = await getData(start,end);
-    console.log(arr)
     objToCsv(arr,dep, year);
+    console.log('55')
 }
 
-export default runScript;
+runScript(23369, 23432, 3, 0)
+
+// export default runScript;

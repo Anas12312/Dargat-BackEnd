@@ -100,42 +100,45 @@ app.get('/', (req, res) => {
     if(!type) {
         res.sendStatus(400).send("Error");
     }
-    if(type === "root") {
-        if (!dep || !year) {
-            res.status(400).send('Stop Missing With Our Data We Can See You !!');
-            return;
+    else {
+        if(type === "root") {
+            if (!dep || !year) {
+                res.status(400).send('Stop Missing With Our Data We Can See You !!');
+                return;
+            }
+            if(Number(dep) === 555 || Number(year) === 555) {
+                res.status(400).send('Get The Fu*k Out !');
+                return;
+            }
+            stats[0]++;
+            if(stats[0] - lastSavedStats[0] >= 5) {
+                refreshStates(0);
+            }
+            stats[Number(dep)*4 + Number(year) + 1]++;
+            if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
+                refreshStates(Number(dep)*4 + Number(year) + 1);
+            }
+            res.send(records[Number(dep)][Number(year)]);
+        }else if(type === "update") {
+            updateRecord(dep, year);
+            res.send('load el files ya 3bd');
+        }else if(type === "reports") {
+            fs.readFile(path.join(__dirname,'../Report/reports.txt'), (err, data) => {
+                if(err) throw err;
+                res.send(data.toLocaleString());
+            })
+        }else if(type === "stats") {
+            res.send(JSON.stringify({counters: stats}))
+        }else if(type === "a7a") {
+            const start = req.query.start ;
+            const end = req.query.end;
+            const d = req.query.d;
+            const y = req.query.y;
+            runScript(start,end,d,y);
+            res.send('a7ateen')
+        }else {
+            res.sendStatus(400).send("error");
         }
-        if(Number(dep) === 555 || Number(year) === 555) {
-            res.status(400).send('Get The Fu*k Out !');
-            return;
-        }
-        stats[0]++;
-        if(stats[0] - lastSavedStats[0] >= 5) {
-            refreshStates(0);
-        }
-        stats[Number(dep)*4 + Number(year) + 1]++;
-        if(stats[Number(dep)*4 + Number(year) + 1] - lastSavedStats[Number(dep)*4 + Number(year) + 1] >= 5) {
-            refreshStates(Number(dep)*4 + Number(year) + 1);
-        }
-        res.send(records[Number(dep)][Number(year)]);
-    }else if(type === "update") {
-        updateRecord(dep, year);
-        res.send('load el files ya 3bd');
-    }else if(type === "reports") {
-        fs.readFile(path.join(__dirname,'../Report/reports.txt'), (err, data) => {
-            if(err) throw err;
-            res.send(data.toLocaleString());
-        })
-    }else if(type === "stats") {
-        res.send(JSON.stringify({counters: stats}))
-    }else if(type === "a7a") {
-        const start = Number(req.query.start as string);
-        const end = Number(req.query.end as string);
-        const d = Number(dep);
-        const y = Number(year);
-        runScript(start,end,d,y);
-    }else {
-        res.sendStatus(400).send("error");
     }
 })
 

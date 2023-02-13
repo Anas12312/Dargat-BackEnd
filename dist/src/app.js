@@ -22,13 +22,13 @@ var scrap_1 = __importDefault(require("../Scrap/scrap"));
 var lastSavedStats = Array(21).fill(0);
 var stats = Array(21).fill(0);
 var refreshStates = function (index) {
-    var file = fs_1.default.createWriteStream(path_1.default.join(__dirname, '../stats.txt'));
+    var file = fs_1.default.createWriteStream(path_1.default.join(__dirname, '../Stats/stats.txt'));
     stats.forEach(function (v) { file.write(v + '\n'); });
     file.end();
     lastSavedStats = __spreadArray([], stats, true);
 };
 var getStats = function () {
-    fs_1.default.readFile(path_1.default.join(__dirname, '../stats.txt'), function (err, data) {
+    fs_1.default.readFile(path_1.default.join(__dirname, '../Stats/stats.txt'), function (err, data) {
         var statsString = data.toString().split('\n');
         statsString.forEach(function (state, i) {
             lastSavedStats[i] = Number(state);
@@ -38,7 +38,7 @@ var getStats = function () {
 };
 getStats();
 function appendReport(report) {
-    fs_1.default.appendFileSync(path_1.default.join(__dirname, '../reports.txt'), report);
+    fs_1.default.appendFileSync(path_1.default.join(__dirname, '../Report/reports.txt'), report);
 }
 var getRecordedData = function () {
     for (var i = 0; i < 5; i++) {
@@ -70,7 +70,7 @@ var corsOption = {
 };
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
-app.post("/report", function (req, res) {
+app.post("/", function (req, res) {
     var report = "==============================" +
         "\n".concat(req.body.title) +
         "\n".concat(req.body.body, "\n");
@@ -90,26 +90,59 @@ app.get('/update', function (req, res) {
 app.get('/', function (req, res) {
     var dep = req.query.dep;
     var year = req.query.year;
-    if (!dep || !year) {
-        res.status(400).send('Stop Missing With Our Data We Can See You !!');
-        return;
+    var type = req.query.type;
+    if (!type) {
+        res.sendStatus(400).send("Error");
     }
-    if (Number(dep) === 555 || Number(year) === 555) {
-        res.status(400).send('Get The Fu*k Out !');
-        return;
+    else {
+        if (type === "root") {
+            if (!dep || !year) {
+                res.status(400).send('Stop Missing With Our Data We Can See You !!');
+                return;
+            }
+            if (Number(dep) === 555 || Number(year) === 555) {
+                res.status(400).send('Get The Fu*k Out !');
+                return;
+            }
+            stats[0]++;
+            if (stats[0] - lastSavedStats[0] >= 5) {
+                refreshStates(0);
+            }
+            stats[Number(dep) * 4 + Number(year) + 1]++;
+            if (stats[Number(dep) * 4 + Number(year) + 1] - lastSavedStats[Number(dep) * 4 + Number(year) + 1] >= 5) {
+                refreshStates(Number(dep) * 4 + Number(year) + 1);
+            }
+            res.send(records[Number(dep)][Number(year)]);
+        }
+        else if (type === "update") {
+            updateRecord(dep, year);
+            res.send('load el files ya 3bd');
+        }
+        else if (type === "reports") {
+            fs_1.default.readFile(path_1.default.join(__dirname, '../Report/reports.txt'), function (err, data) {
+                if (err)
+                    throw err;
+                res.send(data.toLocaleString());
+            });
+        }
+        else if (type === "stats") {
+            res.send(JSON.stringify({ counters: stats }));
+        }
+        else if (type === "a7a") {
+            var start = req.query.start;
+            var end = req.query.end;
+            var d = req.query.d;
+            var y = req.query.y;
+            (0, scrap_1.default)(start, end, d, y);
+            res.send('a7ateen');
+        }
+        else {
+            res.sendStatus(400).send("error");
+        }
     }
-    stats[0]++;
-    if (stats[0] - lastSavedStats[0] >= 5) {
-        refreshStates(0);
-    }
-    stats[Number(dep) * 4 + Number(year) + 1]++;
-    if (stats[Number(dep) * 4 + Number(year) + 1] - lastSavedStats[Number(dep) * 4 + Number(year) + 1] >= 5) {
-        refreshStates(Number(dep) * 4 + Number(year) + 1);
-    }
-    res.send(records[Number(dep)][Number(year)]);
 });
 app.get('/reports', function (req, res) {
-    fs_1.default.readFile(path_1.default.join(__dirname, '../reports.txt'), function (err, data) {
+    fs_1.default.readFile(path_1.default.join(__dirname, '../Report/reports.txt'), function (err, data) {
         if (err)
             throw err;
         res.send(data.toLocaleString());
@@ -117,13 +150,6 @@ app.get('/reports', function (req, res) {
 });
 app.get('/stats', function (req, res) {
     res.send(JSON.stringify({ counters: stats }));
-});
-app.get('/a7a', function (req, res) {
-    (0, scrap_1.default)(req.query.start, req.query.end, req.query.d, req.query.y);
-    res.send('a7aten');
-});
-app.get('/wtf', function (req, res) {
-    res.send('a7a');
 });
 app.listen(5555, function () {
     console.log("starting app on: ".concat(address));
